@@ -5,6 +5,15 @@ definition in a pytest-bdd test suite - and the reverse: from a step definition,
 find every scenario that uses it, or scan the whole repo for step definitions no
 scenario uses at all.
 
+![steplink.nvim: jump from a step to its definition, back to every scenario using it, and list unused steps](assets/demo.gif)
+
+1. `<leader>ss` on a step in a `.feature` file jumps to its step definition.
+2. `<leader>ss` on a step definition lists every scenario that uses it (here in fzf-lua,
+   with a preview), including Scenario Outline steps like `I water the mint with <amount>`.
+3. `:StepLinkOrphans` lists step definitions no scenario uses.
+
+Try it on the small made-up project in [`demo/`](demo/): `cd demo && nvim garden/features/watering.feature`.
+
 ## Why a Python helper
 
 pytest-bdd step definitions often use `pytest_bdd.parsers.re(...)` - real regex, including
