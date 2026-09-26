@@ -1,0 +1,63 @@
+*steplink.txt*   Jump from a Gherkin step to its pytest-bdd step definition
+
+==============================================================================
+CONTENTS                                                *steplink-contents*
+
+    1. Commands ................ |steplink-commands|
+    2. Configuration ............ |steplink-config|
+    3. Health .................... |steplink-health|
+
+==============================================================================
+1. Commands                                             *steplink-commands*
+
+:StepLinkGoto                                                  *:StepLinkGoto*
+    Resolve the Given/When/Then/And/But step under the cursor and jump to its
+    pytest-bdd step definition. Bound to `<leader>ss` in `.feature` (filetype
+    `cucumber`) buffers by default.
+
+:StepLinkGotoDebug                                        *:StepLinkGotoDebug*
+    Same as |:StepLinkGoto|, but also prints the full JSON response from the
+    Python resolver (candidate files searched, match/ambiguity details).
+
+:StepLinkScenarios                                        *:StepLinkScenarios*
+    The reverse direction: resolve the `@given/@when/@then/@step` decorator
+    nearest at-or-above the cursor in a Python steps file, and find every
+    scenario step across the repo that resolves to it. Bound to the same
+    `<leader>ss` as |:StepLinkGoto| by default (a buffer is always exactly one
+    filetype, so there's no real conflict), set only in `.py` buffers whose
+    path contains `/steps/` and that sit under a detectable repo root.
+
+:StepLinkScenariosDebug                              *:StepLinkScenariosDebug*
+    Same as |:StepLinkScenarios|, but also prints the full JSON response.
+
+:StepLinkOrphans                                            *:StepLinkOrphans*
+    Repo-wide scan for step definitions that no scenario resolves to - candidates for
+    dead code, listed in the quickfix window. A one-shot audit rather than a
+    cursor-based lookup, so it has no default keymap. Treat the results as candidates
+    to verify by hand, not a delete list: a false positive here is a bug in the
+    reachability/matching logic, not proof of dead code.
+
+==============================================================================
+2. Configuration                                            *steplink-config*
+>lua
+    require("steplink").setup({
+      python_path = nil,             -- nil = auto-resolve <repo_root>/.venv/bin/python3
+      repo_root_markers = { ".git", "pytest.ini" },
+      keymap = "<leader>ss",         -- false to disable; used for both directions
+      ambiguous_ui = "auto",         -- "auto" | "fzf" | "select" | "quickfix"
+      ambiguous_quickfix_threshold = 4, -- only applies to the "select" fallback
+      debug = false,
+    })
+<
+When multiple step definitions match, "auto" uses fzf-lua's picker
+(syntax-highlighted code preview, via its builtin previewer) if fzf-lua is
+installed, falling back to |vim.ui.select| otherwise. Force one explicitly
+with "fzf", "select", or "quickfix".
+
+==============================================================================
+3. Health                                                    *steplink-health*
+
+Run `:checkhealth steplink` to verify repo-root detection, the Python
+interpreter, and that `pytest_bdd` is importable from it.
+
+ vim:tw=78:ts=8:ft=help:norl:
